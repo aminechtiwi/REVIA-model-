@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ REVIA — BOOT SEQUENCE</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cyan: #00f3ff;
+      --cyan2: rgba(0,243,255,0.15);
+      --gold: #ffb700;
+      --dark: #020812;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--dark);
+      overflow: hidden;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--cyan);
+    }
+
+    /* ── SCANLINES ── */
+    #scanlines {
+      position: fixed; inset: 0; pointer-events: none; z-index: 999;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.18) 2px,
+        rgba(0,0,0,0.18) 4px
+      );
+    }
+
+    /* ── BOOT SCREEN ── */
+    #bootScreen {
+      position: fixed; inset: 0; z-index: 100;
+      background: #020812;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 1.2s ease;
+    }
+
+    /* ── GRID LINES BG ── */
+    #bootScreen::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,243,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,243,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridPan 8s linear infinite;
+    }
+
+    @keyframes gridPan {
+      from { background-position: 0 0; }
+      to   { background-position: 60px 60px; }
+    }
+
+    /* ── CORNER BRACKETS ── */
+    .corner {
+      position: absolute;
+      width: 40px; height: 40px;
+      border-color: var(--cyan);
+      border-style: solid;
+      opacity: 0;
+      animation: cornerFade 0.5s ease forwards;
+    }
+    .corner.tl { top: 24px; left: 24px; border-width: 2px 0 0 2px; animation-delay: 0.2s; }
+    .corner.tr { top: 24px; right: 24px; border-width: 2px 2px 0 0; animation-delay: 0.3s; }
+    .corner.bl { bottom: 24px; left: 24px; border-width: 0 0 2px 2px; animation-delay: 0.4s; }
+    .corner.br { bottom: 24px; right: 24px; border-width: 0 2px 2px 0; animation-delay: 0.5s; }
+
+    @keyframes cornerFade { to { opacity: 1; } }
+
+    /* ── HORIZONTAL SCAN LINE ── */
+    #scanLine {
+      position: absolute; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      box-shadow: 0 0 20px var(--cyan), 0 0 40px var(--cyan);
+      top: 0;
+      animation: scanDown 2.4s ease-in-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes scanDown {
+      0%   { top: 0%; opacity: 1; }
+      100% { top: 100%; opacity: 0.3; }
+    }
+
+    /* ── CENTER RING SYSTEM ── */
+    #ringSystem {
+      position: relative;
+      width: 320px; height: 320px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: scale(0.85) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border-style: solid;
+    }
+
+    .ring-outer {
+      width: 300px; height: 300px;
+      border: 2px solid rgba(0,243,255,0.5);
+      box-shadow: 0 0 25px rgba(0,243,255,0.3), inset 0 0 25px rgba(0,243,255,0.08);
+      animation: spinCW 18s linear infinite;
+    }
+    .ring-outer::before {
+      content: '';
+      position: absolute;
+      width: 10px; height: 10px;
+      background: var(--cyan);
+      border-radius: 50%;
+      top: -5px; left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 12px var(--cyan);
+    }
+
+    .ring-mid {
+      width: 240px; height: 240px;
+      border: 1.5px dashed rgba(0,243,255,0.4);
+      animation: spinCCW 12s linear infinite;
+    }
+    .ring-mid::before {
+      content: '';
+      position: absolute;
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      bottom: -4px; left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 10px var(--gold);
+    }
+
+    .ring-inner {
+      width: 180px; height: 180px;
+      border: 1px solid rgba(255,183,0,0.45);
+      animation: spinCW 8s linear infinite;
+    }
+    .ring-inner::after {
+      content: '';
+      position: absolute;
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      top: -3px; left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    @keyframes spinCW  { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
+    @keyframes spinCCW { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+    /* ── CORE ── */
+    #core {
+      position: absolute;
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, rgba(0,243,255,0.35), rgba(0,50,80,0.6) 60%, rgba(2,8,18,0.9));
+      border: 1.5px solid rgba(0,243,255,0.6);
+      box-shadow: 0 0 40px rgba(0,243,255,0.5), 0 0 80px rgba(0,243,255,0.2), inset 0 0 30px rgba(0,243,255,0.15);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      animation: corePulse 2s ease-in-out infinite;
+      z-index: 10;
+    }
+
+    @keyframes corePulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(0,243,255,0.5), 0 0 80px rgba(0,243,255,0.2), inset 0 0 30px rgba(0,243,255,0.15); }
+      50%       { box-shadow: 0 0 60px rgba(0,243,255,0.8), 0 0 120px rgba(0,243,255,0.35), inset 0 0 45px rgba(0,243,255,0.25); }
+    }
+
+    #coreText {
+      font-family: 'Orbitron', monospace;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--cyan);
+      text-shadow: 0 0 15px var(--cyan), 0 0 30px var(--cyan);
+      letter-spacing: 2px;
+    }
+    #coreSubText {
+      font-size: 8px;
+      color: rgba(0,243,255,0.6);
+      letter-spacing: 3px;
+      margin-top: 4px;
+    }
+
+    /* ── HEX GRID PARTICLES ── */
+    #hexCanvas {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+
+    /* ── TEXT BLOCK ── */
+    #textBlock {
+      text-align: center;
+      max-width: 700px;
+      position: relative; z-index: 10;
+    }
+
+    #mainTitle {
+      font-family: 'Orbitron', monospace;
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--cyan);
+      text-shadow: 0 0 20px var(--cyan), 0 0 60px rgba(0,243,255,0.5);
+      letter-spacing: 12px;
+      opacity: 0;
+      animation: titleReveal 0.8s cubic-bezier(0.16,1,0.3,1) 1.2s forwards;
+      position: relative;
+    }
+
+    #mainTitle::after {
+      content: attr(data-text);
+      position: absolute; inset: 0;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(0,243,255,0.2);
+      animation: glitch1 4s infinite 2s;
+    }
+
+    @keyframes titleReveal {
+      from { opacity: 0; letter-spacing: 30px; filter: blur(10px); }
+      to   { opacity: 1; letter-spacing: 12px; filter: blur(0); }
+    }
+
+    @keyframes glitch1 {
+      0%, 92%, 100% { transform: translate(0); clip-path: none; }
+      93%  { transform: translate(-3px, 1px); clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); }
+      94%  { transform: translate(3px, -1px); clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); }
+      95%  { transform: translate(-1px, 2px); clip-path: polygon(0 10%, 100% 10%, 100% 30%, 0 30%); }
+      96%  { transform: translate(0); clip-path: none; }
+    }
+
+    #subTitle {
+      font-size: 11px;
+      letter-spacing: 6px;
+      color: rgba(0,243,255,0.65);
+      margin-top: 8px;
+      opacity: 0;
+      animation: fadeIn 0.6s ease 1.9s forwards;
+    }
+
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* ── BOOT LOG ── */
+    #bootLog {
+      margin-top: 36px;
+      text-align: left;
+      width: 560px;
+      max-width: 90vw;
+      font-size: 11px;
+      line-height: 1.8;
+      color: rgba(0,243,255,0.7);
+      border: 1px solid rgba(0,243,255,0.15);
+      border-left: 2px solid rgba(0,243,255,0.4);
+      background: rgba(0,243,255,0.03);
+      padding: 14px 18px;
+      max-height: 200px;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeIn 0.4s ease 2.4s forwards;
+      position: relative;
+    }
+
+    #bootLog::before {
+      content: 'BOOT LOG — REVIA INIT';
+      position: absolute; top: -10px; left: 12px;
+      background: #020812;
+      padding: 0 6px;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: rgba(0,243,255,0.5);
+    }
+
+    .log-line {
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .log-line.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .log-ok   { color: #00ff88; }
+    .log-warn { color: var(--gold); }
+    .log-info { color: rgba(0,243,255,0.8); }
+    .log-sys  { color: rgba(150,200,255,0.7); }
+
+    /* ── PROGRESS BAR ── */
+    #progressWrap {
+      margin-top: 28px;
+      width: 560px; max-width: 90vw;
+      opacity: 0;
+      animation: fadeIn 0.4s ease 2.4s forwards;
+    }
+    #progressLabel {
+      display: flex; justify-content: space-between;
+      font-size: 10px; letter-spacing: 2px;
+      color: rgba(0,243,255,0.55);
+      margin-bottom: 6px;
+    }
+    #progressTrack {
+      width: 100%; height: 4px;
+      background: rgba(0,243,255,0.1);
+      border: 1px solid rgba(0,243,255,0.2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #progressBar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, rgba(0,243,255,0.5), var(--cyan));
+      box-shadow: 0 0 12px var(--cyan);
+      border-radius: 2px;
+      transition: width 0.15s ease;
+    }
+    #progressPct {
+      font-size: 10px; letter-spacing: 2px;
+      color: var(--cyan);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    /* ── ENTER BUTTON ── */
+    #enterBtn {
+      margin-top: 32px;
+      padding: 14px 52px;
+      font-family: 'Orbitron', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: var(--dark);
+      background: linear-gradient(135deg, #00c8d8, var(--cyan));
+      border: none;
+      cursor: pointer;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+      box-shadow: 0 0 30px rgba(0,243,255,0.6), 0 0 60px rgba(0,243,255,0.25);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      pointer-events: none;
+    }
+    #enterBtn.ready {
+      animation: btnReveal 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+      pointer-events: all;
+    }
+    #enterBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 50px rgba(0,243,255,0.9), 0 0 90px rgba(0,243,255,0.4);
+    }
+    #enterBtn:active { transform: scale(0.97); }
+
+    @keyframes btnReveal {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── FLASH OVERLAY ── */
+    #flashOverlay {
+      position: fixed; inset: 0; z-index: 900;
+      background: var(--cyan);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.08s ease;
+    }
+
+    /* ── DATA STREAMS (side decorations) ── */
+    .dataStream {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(0,243,255,0.15), transparent);
+      overflow: hidden;
+    }
+    .dataStream.left  { left: 80px; }
+    .dataStream.right { right: 80px; }
+    .dataStream::after {
+      content: '';
+      position: absolute;
+      width: 100%; height: 80px;
+      background: linear-gradient(180deg, transparent, var(--cyan), transparent);
+      animation: streamFall 3s linear infinite;
+    }
+    .dataStream.right::after { animation-delay: -1.5s; }
+
+    @keyframes streamFall {
+      from { top: -80px; }
+      to   { top: 100%; }
+    }
+
+    /* ── HEX NUMBERS OVERLAY ── */
+    .hexNum {
+      position: absolute;
+      font-size: 9px;
+      color: rgba(0,243,255,0.18);
+      pointer-events: none;
+      user-select: none;
+      animation: hexFade 4s ease-in-out infinite;
+    }
+    @keyframes hexFade {
+      0%, 100% { opacity: 0; }
+      50%       { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="scanlines"></div>
+<div id="flashOverlay"></div>
+
+<!-- Boot Screen -->
+<div id="bootScreen">
+
+  <!-- Corner brackets -->
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <!-- Horizontal scan line -->
+  <div id="scanLine"></div>
+
+  <!-- Side data streams -->
+  <div class="dataStream left"></div>
+  <div class="dataStream right"></div>
+
+  <!-- Ring System -->
+  <div id="ringSystem">
+    <canvas id="hexCanvas"></canvas>
+    <div class="ring ring-outer"></div>
+    <div class="ring ring-mid"></div>
+    <div class="ring ring-inner"></div>
+    <div id="core">
+      <div id="coreText">⚡</div>
+      <div id="coreSubText">ONLINE</div>
+    </div>
+  </div>
+
+  <!-- Text Block -->
+  <div id="textBlock">
+    <div id="mainTitle" data-text="REVIA">REVIA</div>
+    <div id="subTitle">AUTONOMOUS QUANTUM AI ASSISTANT • v4.8 NATIVE</div>
+
+    <!-- Boot Log -->
+    <div id="bootLog">
+      <div class="log-line log-info" id="l0">[ 00:00.001 ]  BIOS_CHAIN ................ OK</div>
+      <div class="log-line log-sys"  id="l1">[ 00:00.048 ]  SYNAPTIC_CORE_INIT ........ GROQ 120B LPU</div>
+      <div class="log-line log-sys"  id="l2">[ 00:00.093 ]  VISION_MODULE ............. GEMINI FLASH 3.8</div>
+      <div class="log-line log-ok"   id="l3">[ 00:00.142 ]  NEURAL_MESH_LOAD .......... 14,208 NODES ✓</div>
+      <div class="log-line log-sys"  id="l4">[ 00:00.210 ]  QUANTUM_BUS_CONNECT ....... 8 THREADS ACTIVE</div>
+      <div class="log-line log-ok"   id="l5">[ 00:00.298 ]  MEMORY_ALLOCATE ........... 32 GB RESERVED ✓</div>
+      <div class="log-line log-sys"  id="l6">[ 00:00.371 ]  TTS_ENGINE_LOAD ........... EDGE_NEURAL_v3</div>
+      <div class="log-line log-ok"   id="l7">[ 00:00.449 ]  STT_MODULE ................ DEEPGRAM_NOVA2 ✓</div>
+      <div class="log-line log-warn" id="l8">[ 00:00.511 ]  PC_CONTROL_AGENT .......... SANDBOXED</div>
+      <div class="log-line log-sys"  id="l9">[ 00:00.588 ]  DEEP_SEARCH_THREADS ....... MULTI-SOURCE</div>
+      <div class="log-line log-ok"   id="l10">[ 00:00.640 ]  HOLOGRAPHIC_HUD ........... MOUNTING ✓</div>
+      <div class="log-line log-ok"   id="l11">[ 00:00.720 ]  ALL SYSTEMS NOMINAL — REVIA ONLINE ██████ ✓</div>
+    </div>
+
+    <!-- Progress -->
+    <div id="progressWrap">
+      <div id="progressLabel">
+        <span>INITIALIZING CORE SYSTEMS</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div id="progressTrack"><div id="progressBar"></div></div>
+    </div>
+
+    <!-- Enter Button -->
+    <button id="enterBtn" onclick="launchHUD()">⚡ INITIALIZE REVIA</button>
+  </div>
+</div>
+
+<script>
+  // ── Hex canvas particle ring ──────────────────────────────────────────────
+  const hexCanvas = document.getElementById('hexCanvas');
+  const hCtx = hexCanvas.getContext('2d');
+
+  function resizeHex() {
+    hexCanvas.width  = hexCanvas.offsetWidth  || 320;
+    hexCanvas.height = hexCanvas.offsetHeight || 320;
+  }
+  window.addEventListener('resize', resizeHex);
+  resizeHex();
+
+  const hexParticles = [];
+  for (let i = 0; i < 60; i++) {
+    const angle  = Math.random() * Math.PI * 2;
+    const radius = 130 + Math.random() * 28;
+    hexParticles.push({
+      angle, radius,
+      speed:  (Math.random() < 0.5 ? 1 : -1) * (0.003 + Math.random() * 0.006),
+      size:   Math.random() * 2.5 + 0.8,
+      gold:   Math.random() < 0.2,
+      alpha:  0.3 + Math.random() * 0.7,
+      pulse:  Math.random() * Math.PI * 2,
+    });
+  }
+
+  function drawHex() {
+    const W = hexCanvas.width, H = hexCanvas.height;
+    hCtx.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2;
+
+    hexParticles.forEach(p => {
+      p.angle += p.speed;
+      p.pulse += 0.04;
+      const x = cx + Math.cos(p.angle) * p.radius;
+      const y = cy + Math.sin(p.angle) * p.radius;
+      const a = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+      const col = p.gold ? `rgba(255,183,0,${a})` : `rgba(0,243,255,${a})`;
+
+      hCtx.beginPath();
+      hCtx.arc(x, y, p.size, 0, Math.PI * 2);
+      hCtx.fillStyle = col;
+      hCtx.shadowColor = col;
+      hCtx.shadowBlur = 8;
+      hCtx.fill();
+    });
+
+    hCtx.shadowBlur = 0;
+    requestAnimationFrame(drawHex);
+  }
+  drawHex();
+
+  // ── Floating hex number decorations ──────────────────────────────────────
+  const hexChars = '0123456789ABCDEF';
+  function randomHex(len) {
+    return Array.from({length: len}, () => hexChars[Math.floor(Math.random() * 16)]).join('');
+  }
+  for (let i = 0; i < 28; i++) {
+    const el = document.createElement('div');
+    el.className = 'hexNum';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top  = Math.random() * 100 + 'vh';
+    el.style.animationDelay = (Math.random() * 4) + 's';
+    el.style.animationDuration = (2 + Math.random() * 4) + 's';
+    setInterval(() => { el.textContent = randomHex(8); }, 400 + Math.random() * 600);
+    el.textContent = randomHex(8);
+    document.getElementById('bootScreen').appendChild(el);
+  }
+
+  // ── Boot sequence log + progress ─────────────────────────────────────────
+  const logLines = document.querySelectorAll('.log-line');
+  const bar      = document.getElementById('progressBar');
+  const pct      = document.getElementById('progressPct');
+  const label    = document.querySelector('#progressLabel span:first-child');
+  const enterBtn = document.getElementById('enterBtn');
+
+  const phases = [
+    'INITIALIZING BIOS CHAIN',
+    'LOADING SYNAPTIC CORE',
+    'MOUNTING VISION MODULE',
+    'BUILDING NEURAL MESH',
+    'OPENING QUANTUM BUS',
+    'ALLOCATING MEMORY',
+    'LOADING TTS ENGINE',
+    'CALIBRATING STT MODULE',
+    'SANDBOXING PC AGENT',
+    'SPAWNING SEARCH THREADS',
+    'MOUNTING HOLOGRAPHIC HUD',
+    'ALL SYSTEMS NOMINAL',
+  ];
+
+  let lineIdx = 0;
+  let progress = 0;
+
+  function bootTick() {
+    if (lineIdx >= logLines.length) {
+      // Boot complete
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      label.textContent = '⚡ REVIA ONLINE — ALL SYSTEMS NOMINAL';
+      label.style.color = '#00ff88';
+      setTimeout(() => enterBtn.classList.add('ready'), 200);
+      return;
+    }
+
+    logLines[lineIdx].classList.add('visible');
+    if (phases[lineIdx]) label.textContent = phases[lineIdx];
+
+    const targetPct = Math.round(((lineIdx + 1) / logLines.length) * 100);
+    animateProgress(progress, targetPct);
+    progress = targetPct;
+
+    lineIdx++;
+    const delay = lineIdx < 3 ? 200 : (lineIdx < 8 ? 280 : 220);
+    setTimeout(bootTick, delay);
+  }
+
+  function animateProgress(from, to) {
+    const steps = 12;
+    let s = 0;
+    const iv = setInterval(() => {
+      s++;
+      const v = from + ((to - from) * s / steps);
+      bar.style.width = v + '%';
+      pct.textContent = Math.round(v) + '%';
+      if (s >= steps) clearInterval(iv);
+    }, 12);
+  }
+
+  // Start boot after scan line + ring appear
+  setTimeout(bootTick, 2600);
+
+  // ── Random glitch flicker on core ────────────────────────────────────────
+  function glitchCore() {
+    const core = document.getElementById('coreText');
+    const glyphs = ['⚡','R','E','V','I','A','◈','▣','⬡','◉'];
+    const orig = '⚡';
+    let count = 0;
+    const iv = setInterval(() => {
+      core.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+      count++;
+      if (count > 5) { core.textContent = orig; clearInterval(iv); }
+    }, 60);
+    setTimeout(glitchCore, 3000 + Math.random() * 4000);
+  }
+  setTimeout(glitchCore, 3500);
+
+  // ── Launch the real HUD ───────────────────────────────────────────────────
+  function launchHUD() {
+    // Flash
+    const flash = document.getElementById('flashOverlay');
+    flash.style.opacity = '1';
+
+    setTimeout(() => {
+      flash.style.transition = 'opacity 0.6s ease';
+      flash.style.opacity = '0';
+
+      // Fade out boot screen
+      const boot = document.getElementById('bootScreen');
+      boot.style.opacity = '0';
+      boot.style.transition = 'opacity 0.7s ease 0.2s';
+
+      setTimeout(() => {
+        boot.style.display = 'none';
+        // Tell pywebview Python bridge the UI is ready
+        if (window.pywebview && window.pywebview.api) {
+          window.pywebview.api.on_ui_ready();
+        }
+        // Signal HUD to show
+        if (window.reviaBootComplete) {
+          window.reviaBootComplete();
+        }
+      }, 900);
+    }, 120);
+  }
+
+  // Auto-launch after everything is done (optional: remove if you want manual click only)
+  // setTimeout(launchHUD, 8500);
+</script>
+</body>
+</html>

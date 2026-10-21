@@ -1,0 +1,33 @@
+{
+  "assistant_name": "REVIA",
+  "default_language": "auto",
+  "require_permission": true,
+  "voice_enabled": true,
+  "voice_speed": 150,
+  "theme": "dark",
+  "llm_routing": {
+    "master": "gemini/gemini-flash-latest",
+    "reasoning_worker": "openrouter/deepseek/deepseek-r1:free",
+    "coding_worker": "openrouter/qwen/qwen-2.5-coder-32b-instruct:free",
+    "multilingual_worker": "openrouter/qwen/qwen-2.5-72b-instruct:free",
+    "fast_worker": "groq/llama-3.3-70b-versatile",
+    "vision_worker": "gemini/gemini-flash-latest"
+  },
+  "apps": {
+    "chrome":    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "firefox":   "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+    "notepad":   "notepad.exe",
+    "explorer":  "explorer.exe",
+    "vscode":    "code",
+    "spotify":   "spotify.exe"
+  },
+  "websites": {
+    "linkedin":  "https://www.linkedin.com",
+    "gmail":     "https://mail.google.com",
+    "calendar":  "https://calendar.google.com",
+    "youtube":   "https://www.youtube.com",
+    "github":    "https://github.com"
+  },
+  "memory_max_messages": 20,
+  "screenshot_on_problem": true
+}

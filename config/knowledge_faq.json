@@ -1,0 +1,41 @@
+{
+  "system": {
+    "name": "REVIA",
+    "version": "4.8 Native",
+    "description": "Autonomous Quantum AI Assistant with Synaptic Multi-Model Engine",
+    "supported_languages": ["French", "English"],
+    "voice_engine": "Edge Neural TTS / Deepgram Nova-2 STT",
+    "developer": "DeepMind Agentic Architecture Team",
+    "environment": "Windows Desktop FUI Native Holographic Core"
+  },
+  "faq": [
+    {
+      "question": "What is REVIA?",
+      "answer": "REVIA is an autonomous AI assistant powered by a parallel multi-model cloud brain, real-time voice, vision diagnostics, and desktop PC control capabilities."
+    },
+    {
+      "question": "How does REVIA answer questions?",
+      "answer": "REVIA queries multiple frontier cloud models in parallel (Groq 120B, Gemini, OpenRouter) with a 5-second deadline, detects agreement between models, uses Gemini scoring evaluation when needed, and caches all responses for instant answers."
+    },
+    {
+      "question": "What tools can REVIA use?",
+      "answer": "REVIA can compose and send emails via Gmail, search LinkedIn for job openings, open and read emails, manage Google Calendar events, launch desktop apps and websites, inspect and diagnose errors on the screen, check PC hardware health (CPU, RAM, Disk), and execute autonomous deep web research."
+    },
+    {
+      "question": "Does REVIA ask for permission before running actions?",
+      "answer": "Yes. REVIA operates with safety guardrails and will request user confirmation before launching applications or executing actions on the computer."
+    },
+    {
+      "question": "Which models does REVIA use?",
+      "answer": "REVIA uses Groq 120B/20B LPU for speed, Google Gemini Flash for vision and evaluation, and OpenRouter reasoning models for complex logic."
+    },
+    {
+      "question": "Qu'est-ce que REVIA ?",
+      "answer": "REVIA est une assistante IA autonome propulsée par un cerveau multi-modèles en parallèle dans le cloud, avec voix temps réel, vision par capture d'écran, et contrôle sécurisé du PC."
+    },
+    {
+      "question": "Quelles sont les capacités de REVIA ?",
+      "answer": "REVIA peut exécuter des recherches approfondies sur le web, ouvrir des applications et sites, diagnostiquer l'écran, consulter Gmail et Google Calendar, et répondre instantanément à toute question intellectuelle ou technique."
+    }
+  ]
+}

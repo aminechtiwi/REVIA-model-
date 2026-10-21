@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ REVIA — Quantum Holographic AI Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap');
+
+    /* ══ BOOT SEQUENCE OVERLAY ══════════════════════════════════════════════ */
+    #bootOverlay{position:fixed;inset:0;z-index:9999;background:#020812;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity 1s ease}
+    #bootOverlay::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,243,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,243,255,.04) 1px,transparent 1px);background-size:60px 60px;animation:bootGridPan 8s linear infinite;pointer-events:none}
+    @keyframes bootGridPan{from{background-position:0 0}to{background-position:60px 60px}}
+    .boot-corner{position:absolute;width:40px;height:40px;border-color:#00f3ff;border-style:solid;opacity:0;animation:bootCornerFade .5s ease forwards}
+    .boot-corner.tl{top:24px;left:24px;border-width:2px 0 0 2px;animation-delay:.2s}
+    .boot-corner.tr{top:24px;right:24px;border-width:2px 2px 0 0;animation-delay:.3s}
+    .boot-corner.bl{bottom:24px;left:24px;border-width:0 0 2px 2px;animation-delay:.4s}
+    .boot-corner.br{bottom:24px;right:24px;border-width:0 2px 2px 0;animation-delay:.5s}
+    @keyframes bootCornerFade{to{opacity:1}}
+    #bootScanLine{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00f3ff,transparent);box-shadow:0 0 20px #00f3ff,0 0 40px #00f3ff;animation:bootScanDown 2.4s ease-in-out forwards;opacity:0}
+    @keyframes bootScanDown{0%{top:0%;opacity:1}100%{top:100%;opacity:.3}}
+    .boot-stream{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,rgba(0,243,255,.15),transparent);overflow:hidden}
+    .boot-stream.left{left:80px}.boot-stream.right{right:80px}
+    .boot-stream::after{content:'';position:absolute;width:100%;height:80px;background:linear-gradient(180deg,transparent,#00f3ff,transparent);animation:bootStreamFall 3s linear infinite}
+    .boot-stream.right::after{animation-delay:-1.5s}
+    @keyframes bootStreamFall{from{top:-80px}to{top:100%}}
+    #bootRingSystem{position:relative;width:300px;height:300px;display:flex;align-items:center;justify-content:center;margin-bottom:40px;opacity:0;animation:bootFadeUp .8s ease .6s forwards}
+    @keyframes bootFadeUp{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .boot-ring{position:absolute;border-radius:50%;border-style:solid}
+    .boot-ring-outer{width:280px;height:280px;border:2px solid rgba(0,243,255,.5);box-shadow:0 0 25px rgba(0,243,255,.3),inset 0 0 25px rgba(0,243,255,.08);animation:bootSpinCW 18s linear infinite}
+    .boot-ring-outer::before{content:'';position:absolute;width:10px;height:10px;background:#00f3ff;border-radius:50%;top:-5px;left:50%;transform:translateX(-50%);box-shadow:0 0 12px #00f3ff}
+    .boot-ring-mid{width:220px;height:220px;border:1.5px dashed rgba(0,243,255,.4);animation:bootSpinCCW 12s linear infinite}
+    .boot-ring-mid::before{content:'';position:absolute;width:8px;height:8px;background:#ffb700;border-radius:50%;bottom:-4px;left:50%;transform:translateX(-50%);box-shadow:0 0 10px #ffb700}
+    .boot-ring-inner{width:165px;height:165px;border:1px solid rgba(255,183,0,.45);animation:bootSpinCW 8s linear infinite}
+    .boot-ring-inner::after{content:'';position:absolute;width:6px;height:6px;background:#ffb700;border-radius:50%;top:-3px;left:50%;transform:translateX(-50%);box-shadow:0 0 8px #ffb700}
+    @keyframes bootSpinCW{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes bootSpinCCW{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
+    #bootCore{position:absolute;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(0,243,255,.35),rgba(0,50,80,.6) 60%,rgba(2,8,18,.9));border:1.5px solid rgba(0,243,255,.6);box-shadow:0 0 40px rgba(0,243,255,.5),0 0 80px rgba(0,243,255,.2),inset 0 0 30px rgba(0,243,255,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:bootCorePulse 2s ease-in-out infinite;z-index:10}
+    @keyframes bootCorePulse{0%,100%{box-shadow:0 0 40px rgba(0,243,255,.5),0 0 80px rgba(0,243,255,.2),inset 0 0 30px rgba(0,243,255,.15)}50%{box-shadow:0 0 60px rgba(0,243,255,.8),0 0 120px rgba(0,243,255,.35),inset 0 0 45px rgba(0,243,255,.25)}}
+    #bootCoreIcon{font-size:22px;text-shadow:0 0 15px #00f3ff,0 0 30px #00f3ff}
+    #bootCoreSub{font-size:7px;letter-spacing:3px;color:rgba(0,243,255,.6);margin-top:3px;font-family:'Share Tech Mono',monospace}
+    #bootHexCanvas{position:absolute;inset:0;pointer-events:none}
+    #bootTitle{font-family:'Orbitron',monospace;font-size:56px;font-weight:900;color:#00f3ff;text-shadow:0 0 20px #00f3ff,0 0 60px rgba(0,243,255,.5);letter-spacing:14px;opacity:0;position:relative;animation:bootTitleReveal .8s cubic-bezier(.16,1,.3,1) 1.2s forwards}
+    @keyframes bootTitleReveal{from{opacity:0;letter-spacing:32px;filter:blur(10px)}to{opacity:1;letter-spacing:14px;filter:blur(0)}}
+    #bootTitle::after{content:attr(data-text);position:absolute;inset:0;color:transparent;-webkit-text-stroke:1px rgba(0,243,255,.2);animation:bootGlitch 5s infinite 3s}
+    @keyframes bootGlitch{0%,90%,100%{transform:translate(0);clip-path:none}91%{transform:translate(-4px,1px);clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%)}92%{transform:translate(3px,-1px);clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%)}93%{transform:translate(-1px,2px);clip-path:polygon(0 10%,100% 10%,100% 30%,0 30%)}94%{transform:translate(0);clip-path:none}}
+    #bootSubTitle{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:6px;color:rgba(0,243,255,.6);margin-top:8px;opacity:0;animation:bootFadeIn .6s ease 2s forwards}
+    @keyframes bootFadeIn{to{opacity:1}}
+    #bootLog{margin-top:30px;text-align:left;width:540px;max-width:88vw;font-family:'Share Tech Mono',monospace;font-size:10.5px;line-height:1.85;color:rgba(0,243,255,.7);border:1px solid rgba(0,243,255,.15);border-left:2px solid rgba(0,243,255,.4);background:rgba(0,243,255,.03);padding:12px 16px;max-height:188px;overflow:hidden;opacity:0;animation:bootFadeIn .4s ease 2.5s forwards;position:relative}
+    #bootLog::before{content:'BOOT LOG — REVIA INIT';position:absolute;top:-10px;left:12px;background:#020812;padding:0 6px;font-size:8px;letter-spacing:3px;color:rgba(0,243,255,.45)}
+    .bll{opacity:0;transform:translateX(-8px);transition:opacity .3s ease,transform .3s ease}.bll.vis{opacity:1;transform:translateX(0)}
+    .bll-ok{color:#00ff88}.bll-warn{color:#ffb700}.bll-info{color:rgba(0,243,255,.8)}.bll-sys{color:rgba(150,200,255,.65)}
+    #bootProg{margin-top:22px;width:540px;max-width:88vw;opacity:0;animation:bootFadeIn .4s ease 2.5s forwards}
+    #bootProgLabel{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(0,243,255,.5);margin-bottom:5px}
+    #bootProgTrack{width:100%;height:4px;background:rgba(0,243,255,.1);border:1px solid rgba(0,243,255,.2);border-radius:2px;overflow:hidden}
+    #bootProgBar{height:100%;width:0%;background:linear-gradient(90deg,rgba(0,243,255,.5),#00f3ff);box-shadow:0 0 12px #00f3ff;border-radius:2px;transition:width .12s ease}
+    #bootEnterBtn{margin-top:26px;padding:14px 52px;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:6px;color:#020812;background:linear-gradient(135deg,#00c8d8,#00f3ff);border:none;cursor:pointer;clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);box-shadow:0 0 30px rgba(0,243,255,.6),0 0 60px rgba(0,243,255,.25);opacity:0;transform:translateY(16px);transition:transform .15s ease,box-shadow .15s ease;pointer-events:none}
+    #bootEnterBtn.boot-ready{animation:bootBtnReveal .6s cubic-bezier(.16,1,.3,1) forwards;pointer-events:all}
+    @keyframes bootBtnReveal{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    #bootEnterBtn:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(0,243,255,.9),0 0 90px rgba(0,243,255,.4)}
+    #bootEnterBtn:active{transform:scale(.97)}
+    #bootFlash{position:fixed;inset:0;z-index:99999;background:#00f3ff;opacity:0;pointer-events:none;transition:opacity .08s ease}
+    .boot-hex{position:absolute;font-size:8px;color:rgba(0,243,255,.14);font-family:'Share Tech Mono',monospace;pointer-events:none;user-select:none;animation:bootHexFade 4s ease-in-out infinite}
+    @keyframes bootHexFade{0%,100%{opacity:0}50%{opacity:1}}
+    /* ══ END BOOT STYLES ════════════════════════════════════════════════════ */
+
+    :root {
+      --cyan-neon: #00f3ff;
+      --cyan-glow: rgba(0, 243, 255, 0.6);
+      --blue-electric: #0066ff;
+      --gold-accent: #ffb700;
+      --gold-glow: rgba(255, 183, 0, 0.7);
+      --bg-dark: #02050e;
+      --hud-panel-bg: rgba(6, 18, 38, 0.85);
+      --hud-border: rgba(0, 243, 255, 0.4);
+    }
+
+    /* Fallback fonts if offline */
+    body {
+      background-color: var(--bg-dark);
+      color: #e2e8f0;
+      font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .font-hud {
+      font-family: 'Orbitron', monospace, sans-serif;
+    }
+
+    .font-mono-hud {
+      font-family: 'Share Tech Mono', 'Consolas', monospace;
+    }
+
+    /* Ambient CRT Scanline Effect */
+    .scanlines {
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 243, 255, 0.03) 50%
+      ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.01),
+        rgba(0, 255, 0, 0.005),
+        rgba(0, 0, 255, 0.01)
+      );
+      background-size: 100% 3px, 3px 100%;
+      pointer-events: none;
+    }
+
+    /* Glowing borders and glassmorphism */
+    .glass-hud {
+      background: linear-gradient(135deg, rgba(8, 25, 52, 0.82) 0%, rgba(3, 12, 28, 0.92) 100%);
+      border: 1px solid rgba(0, 243, 255, 0.35);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.15), inset 0 0 15px rgba(0, 243, 255, 0.08);
+      backdrop-filter: blur(12px);
+      position: relative;
+    }
+
+    .glass-hud::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px;
+      width: 8px; height: 8px;
+      border-top: 2px solid var(--cyan-neon);
+      border-left: 2px solid var(--cyan-neon);
+    }
+
+    .glass-hud::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; right: -2px;
+      width: 8px; height: 8px;
+      border-bottom: 2px solid var(--gold-accent);
+      border-right: 2px solid var(--gold-accent);
+    }
+
+    /* 3D Perspective Transformations */
+    .perspective-container {
+      perspective: 1400px;
+      transform-style: preserve-3d;
+    }
+
+    .panel-left-top {
+      transform: rotateY(18deg) rotateX(3deg) translateZ(10px);
+      transition: transform 0.4s ease;
+    }
+    .panel-left-top:hover {
+      transform: rotateY(8deg) rotateX(0deg) translateZ(35px);
+    }
+
+    .panel-left-bottom {
+      transform: rotateY(20deg) rotateX(-4deg) translateZ(15px);
+      transition: transform 0.4s ease;
+    }
+    .panel-left-bottom:hover {
+      transform: rotateY(10deg) rotateX(0deg) translateZ(40px);
+    }
+
+    .panel-right-top {
+      transform: rotateY(-18deg) rotateX(3deg) translateZ(10px);
+      transition: transform 0.4s ease;
+    }
+    .panel-right-top:hover {
+      transform: rotateY(-8deg) rotateX(0deg) translateZ(35px);
+    }
+
+    .panel-right-bottom {
+      transform: rotateY(-20deg) rotateX(-4deg) translateZ(15px);
+      transition: transform 0.4s ease;
+    }
+    .panel-right-bottom:hover {
+      transform: rotateY(-10deg) rotateX(0deg) translateZ(40px);
+    }
+
+    /* Gyro Ring Keyframe Animations */
+    @keyframes spin-cw {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spin-ccw {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    @keyframes pulse-energy {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.02); opacity: 1; }
+    }
+    @keyframes pulse-mic {
+      0%, 100% { box-shadow: 0 0 10px #ffb700; transform: scale(1); }
+      50% { box-shadow: 0 0 25px #ffb700, 0 0 40px #ff8800; transform: scale(1.06); }
+    }
+
+    .ring-spin-fast {
+      animation: spin-cw 20s linear infinite;
+    }
+    .ring-spin-slow {
+      animation: spin-ccw 35s linear infinite;
+    }
+    .energy-pulse {
+      animation: pulse-energy 3s ease-in-out infinite;
+    }
+    .mic-active {
+      animation: pulse-mic 1.2s ease-in-out infinite !important;
+      background: linear-gradient(135deg, #ff8800, #ffb700) !important;
+      color: #000 !important;
+      font-weight: 800 !important;
+    }
+
+    /* Glow text */
+    .glow-cyan {
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.8), 0 0 20px rgba(0, 243, 255, 0.4);
+    }
+    .glow-gold {
+      text-shadow: 0 0 10px rgba(255, 183, 0, 0.8), 0 0 20px rgba(255, 183, 0, 0.4);
+    }
+
+    /* Custom Futuristic Scrollbar */
+    .hud-scrollbar::-webkit-scrollbar {
+      width: 5px;
+    }
+    .hud-scrollbar::-webkit-scrollbar-track {
+      background: rgba(3, 10, 25, 0.6);
+    }
+    .hud-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(0, 243, 255, 0.4);
+      border-radius: 3px;
+    }
+    .hud-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 243, 255, 0.8);
+      box-shadow: 0 0 8px #00f3ff;
+    }
+
+    /* Markdown Code Style in Chat */
+    .chat-bubble pre {
+      background: rgba(0, 15, 35, 0.85);
+      border: 1px solid rgba(0, 243, 255, 0.25);
+      border-radius: 4px;
+      padding: 6px 10px;
+      margin: 6px 0;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #00f3ff;
+      overflow-x: auto;
+    }
+    .chat-bubble code {
+      font-family: 'Share Tech Mono', monospace;
+      color: #ffb700;
+      background: rgba(255, 183, 0, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="relative w-screen h-screen bg-[#02050e] overflow-hidden flex flex-col justify-between">
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       JARVIS-STYLE CINEMATIC BOOT SEQUENCE OVERLAY
+  ════════════════════════════════════════════════════════════════════════ -->
+  <div id="bootFlash"></div>
+  <div id="bootOverlay">
+    <div class="boot-corner tl"></div>
+    <div class="boot-corner tr"></div>
+    <div class="boot-corner bl"></div>
+    <div class="boot-corner br"></div>
+    <div id="bootScanLine"></div>
+    <div class="boot-stream left"></div>
+    <div class="boot-stream right"></div>
+
+    <!-- Gyroscopic Ring System -->
+    <div id="bootRingSystem">
+      <canvas id="bootHexCanvas"></canvas>
+      <div class="boot-ring boot-ring-outer"></div>
+      <div class="boot-ring boot-ring-mid"></div>
+      <div class="boot-ring boot-ring-inner"></div>
+      <div id="bootCore">
+        <div id="bootCoreIcon">⚡</div>
+        <div id="bootCoreSub">ONLINE</div>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div style="text-align:center;position:relative;z-index:10">
+      <div id="bootTitle" data-text="REVIA">REVIA</div>
+      <div id="bootSubTitle">AUTONOMOUS QUANTUM AI ASSISTANT &nbsp;•&nbsp; v4.8 NATIVE</div>
+
+      <!-- Boot Log -->
+      <div id="bootLog">
+        <div class="bll bll-info" id="bl0">[ 00:00.001 ]  BIOS_CHAIN ................ OK</div>
+        <div class="bll bll-sys"  id="bl1">[ 00:00.048 ]  SYNAPTIC_CORE_INIT ........ GROQ 120B LPU</div>
+        <div class="bll bll-sys"  id="bl2">[ 00:00.093 ]  VISION_MODULE ............. GEMINI FLASH 3.8</div>
+        <div class="bll bll-ok"   id="bl3">[ 00:00.142 ]  NEURAL_MESH_LOAD .......... 14,208 NODES ✓</div>
+        <div class="bll bll-sys"  id="bl4">[ 00:00.210 ]  QUANTUM_BUS_CONNECT ....... 8 THREADS ACTIVE</div>
+        <div class="bll bll-ok"   id="bl5">[ 00:00.298 ]  MEMORY_ALLOCATE ........... 32 GB RESERVED ✓</div>
+        <div class="bll bll-sys"  id="bl6">[ 00:00.371 ]  TTS_ENGINE_LOAD ........... EDGE_NEURAL_v3</div>
+        <div class="bll bll-ok"   id="bl7">[ 00:00.449 ]  STT_MODULE ................ DEEPGRAM_NOVA2 ✓</div>
+        <div class="bll bll-warn" id="bl8">[ 00:00.511 ]  PC_CONTROL_AGENT .......... SANDBOXED</div>
+        <div class="bll bll-sys"  id="bl9">[ 00:00.588 ]  DEEP_SEARCH_THREADS ....... MULTI-SOURCE</div>
+        <div class="bll bll-ok"   id="bl10">[ 00:00.640 ]  HOLOGRAPHIC_HUD ........... MOUNTING ✓</div>
+        <div class="bll bll-ok"   id="bl11">[ 00:00.720 ]  ALL SYSTEMS NOMINAL — REVIA ONLINE ██████ ✓</div>
+      </div>
+
+      <!-- Progress -->
+      <div id="bootProg">
+        <div id="bootProgLabel">
+          <span id="bootProgPhase">INITIALIZING CORE SYSTEMS</span>
+          <span id="bootProgPct">0%</span>
+        </div>
+        <div id="bootProgTrack"><div id="bootProgBar"></div></div>
+      </div>
+
+      <!-- Enter -->
+      <button id="bootEnterBtn" onclick="reviaBootLaunch()">⚡ &nbsp; INITIALIZE REVIA</button>
+    </div>
+  </div>
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Background Cybernetic Lab Server Racks & Ambient Glow -->
+  <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute inset-0 opacity-25 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#003b6f] via-[#020919] to-[#01040a]"></div>
+    
+    <!-- Vertical Server Racks with Blinking LEDs -->
+    <div class="absolute left-6 top-12 bottom-24 w-32 border-r border-cyan-900/40 flex flex-col justify-between py-6 opacity-30">
+      <div class="flex flex-col gap-3">
+        <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-cyan-500"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-cyan-300"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></div>
+      </div>
+      <div class="text-[9px] font-mono-hud text-cyan-600 rotate-90 origin-left">SERVER_RACK_01</div>
+    </div>
+
+    <div class="absolute right-6 top-12 bottom-24 w-32 border-l border-cyan-900/40 flex flex-col justify-between py-6 items-end opacity-30">
+      <div class="flex flex-col gap-3 items-end">
+        <div class="w-1.5 h-1.5 rounded-full bg-cyan-300"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></div>
+        <div class="w-1.5 h-1.5 rounded-full bg-cyan-400"></div>
+      </div>
+      <div class="text-[9px] font-mono-hud text-cyan-600 -rotate-90 origin-right">SERVER_RACK_02</div>
+    </div>
+  </div>
+
+  <!-- Ambient CRT Scanline Overlay -->
+  <div class="absolute inset-0 scanlines z-10"></div>
+
+  <!-- TOP HEADER HUD STATUS BAR -->
+  <header class="relative z-30 w-full flex items-center justify-between px-8 py-3 bg-[#030919]/90 border-b border-cyan-500/30 shadow-[0_4px_25px_rgba(0,243,255,0.15)]">
+    <!-- Left Logo & Branding -->
+    <div class="flex items-center gap-4">
+      <div class="relative w-9 h-9 border border-cyan-400 rounded flex items-center justify-center bg-cyan-950/60 shadow-[0_0_12px_rgba(0,243,255,0.4)]">
+        <span class="text-cyan-300 font-hud font-bold text-lg glow-cyan">⚡</span>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-hud font-extrabold text-base tracking-widest text-cyan-300 glow-cyan">REVIA // FUI CORE</h1>
+          <span class="text-[10px] font-mono-hud px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-500/50">v4.8 NATIVE</span>
+        </div>
+        <p class="text-[10px] font-mono-hud text-cyan-500 tracking-wider">AUTONOMOUS SYNAPTIC REASONING ENGINE • SYSTEM ONLINE</p>
+      </div>
+    </div>
+
+    <!-- Center Status Indicator -->
+    <div class="hidden md:flex items-center gap-7 text-xs font-mono-hud">
+      <div class="flex items-center gap-2">
+        <span class="text-cyan-500">NEURAL SYNC:</span>
+        <span class="text-cyan-300 font-bold glow-cyan">99.84%</span>
+      </div>
+      <div class="w-px h-4 bg-cyan-500/30"></div>
+      <div class="flex items-center gap-2">
+        <span class="text-amber-500">ENGINE:</span>
+        <span id="modelIndicator" class="text-amber-400 font-bold glow-gold">GROQ 120B LPU</span>
+      </div>
+      <div class="w-px h-4 bg-cyan-500/30"></div>
+      <div class="flex items-center gap-2">
+        <span class="text-cyan-500">VISION:</span>
+        <span class="text-cyan-300 font-bold">GEMINI FLASH</span>
+      </div>
+      <div class="w-px h-4 bg-cyan-500/30"></div>
+      <div class="flex items-center gap-2">
+        <span class="text-cyan-500">STATE:</span>
+        <span id="systemStateBadge" class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-400/60 font-bold">ONLINE</span>
+      </div>
+    </div>
+
+    <!-- Right Controls / Time -->
+    <div class="flex items-center gap-4">
+      <div class="text-right">
+        <div id="liveClock" class="font-mono-hud text-sm text-cyan-300 font-bold tracking-widest">00:00:00 UTC</div>
+        <div id="latencyLabel" class="text-[10px] font-mono-hud text-cyan-600">LATENCY: 0.18ms</div>
+      </div>
+      <div class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_12px_#00f3ff] animate-pulse"></div>
+    </div>
+  </header>
+
+  <!-- MAIN 3D HOLOGRAPHIC STAGE -->
+  <main class="relative z-20 flex-1 w-full perspective-container flex items-center justify-between px-6 py-2 overflow-hidden">
+
+    <!-- LEFT HUD COLUMN (FLOATING 3D GLASS WIDGETS) -->
+    <div class="w-72 flex flex-col gap-3.5 z-30">
+      
+      <!-- WIDGET 1: SYSTEM DIAGNOSTICS & AI CORE GAUGE -->
+      <div class="glass-hud panel-left-top p-3.5 rounded-lg">
+        <div class="flex items-center justify-between border-b border-cyan-500/30 pb-1.5 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <h3 class="font-hud text-[11px] tracking-wider text-cyan-300 font-bold">SYSTEM DIAGNOSTICS</h3>
+          </div>
+          <span class="text-[9px] font-mono-hud text-cyan-500">CORE #81</span>
+        </div>
+
+        <div class="flex items-center gap-3 mb-2.5">
+          <!-- Circular AI Core Meter -->
+          <div class="relative w-16 h-16 flex items-center justify-center">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" stroke="rgba(0, 243, 255, 0.15)" stroke-width="6" fill="none" />
+              <circle id="aiCircleMeter" cx="50" cy="50" r="42" stroke="#00f3ff" stroke-width="6" stroke-dasharray="264" stroke-dashoffset="35" stroke-linecap="round" fill="none" class="filter drop-shadow-[0_0_6px_#00f3ff]" />
+            </svg>
+            <div class="absolute flex flex-col items-center justify-center">
+              <span class="font-hud font-bold text-xs text-cyan-300">AI</span>
+              <span id="aiCorePct" class="text-[9px] font-mono-hud text-cyan-400">92%</span>
+            </div>
+          </div>
+
+          <!-- Diagnostic Metrics -->
+          <div class="flex-1 space-y-1.5 text-[10px] font-mono-hud">
+            <div>
+              <div class="flex justify-between text-cyan-400/90 mb-0.5">
+                <span>CPU USAGE</span>
+                <span id="cpuVal">14.8 %</span>
+              </div>
+              <div class="w-full bg-cyan-950/80 h-1.5 rounded-full overflow-hidden border border-cyan-500/30">
+                <div id="cpuBar" class="bg-cyan-400 h-full w-[15%] shadow-[0_0_8px_#00f3ff] transition-all duration-500"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-cyan-400/90 mb-0.5">
+                <span>RAM ALLOC</span>
+                <span id="ramVal">8.4 / 32 GB</span>
+              </div>
+              <div class="w-full bg-cyan-950/80 h-1.5 rounded-full overflow-hidden border border-cyan-500/30">
+                <div id="ramBar" class="bg-cyan-400 h-full w-[38%] shadow-[0_0_8px_#00f3ff] transition-all duration-500"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-amber-400 mb-0.5">
+                <span>SYNAPSE BUS</span>
+                <span>120B PARAMS</span>
+              </div>
+              <div class="w-full bg-cyan-950/80 h-1.5 rounded-full overflow-hidden border border-amber-500/30">
+                <div class="bg-amber-400 h-full w-[96%] shadow-[0_0_8px_#ffb700]"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wireframe Data Grid Mini Plot -->
+        <div class="h-12 w-full border border-cyan-500/20 bg-cyan-950/30 rounded p-1 relative overflow-hidden flex items-end gap-1">
+          <canvas id="miniTelemetryCanvas" class="w-full h-full"></canvas>
+          <span class="absolute top-1 left-2 text-[8px] font-mono-hud text-cyan-500/70">REASONING_LATENCY_HISTOGRAM</span>
+        </div>
+      </div>
+
+      <!-- WIDGET 2: NEURAL MAPPING & TOPOLOGY -->
+      <div class="glass-hud panel-left-bottom p-3.5 rounded-lg">
+        <div class="flex items-center justify-between border-b border-cyan-500/30 pb-1.5 mb-1.5">
+          <h3 class="font-hud text-[11px] tracking-wider text-cyan-300 font-bold">NEURAL MAPPING</h3>
+          <span class="text-[9px] font-mono-hud text-amber-400 border border-amber-400/30 px-1.5 py-0.5 rounded">8K RES</span>
+        </div>
+        <p class="text-[10px] font-mono-hud text-cyan-400/80 mb-1.5">CEREBRAL CORTEX SYNC // REAL-TIME</p>
+        
+        <!-- Animated 3D Coordinate Grid Box -->
+        <div class="relative h-20 w-full bg-cyan-950/40 border border-cyan-500/30 rounded overflow-hidden flex items-center justify-center">
+          <canvas id="wireframeBoxCanvas" class="w-full h-full"></canvas>
+          <div class="absolute bottom-1 right-2 text-[8px] font-mono-hud text-cyan-400/70">ROTATION: +45.2° / X-Y-Z</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER 3D HOLOGRAPHIC POD & BRAIN VIEWPORT -->
+    <div class="relative flex-1 h-[460px] flex items-center justify-center">
+
+      <!-- Top Pod Collar / Emitter (Suspended from top) -->
+      <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-72 h-8 border-t-2 border-b border-cyan-400/80 bg-gradient-to-b from-[#0e274a] to-transparent rounded-t-full shadow-[0_0_20px_rgba(0,243,255,0.4)] flex items-center justify-center pointer-events-none">
+        <div class="w-40 h-0.5 bg-cyan-400/80 blur-xs rounded-full"></div>
+      </div>
+
+      <!-- 3D Gyroscopic Concentric Data Rings (SVG) -->
+      <div class="absolute w-[440px] h-[440px] pointer-events-none flex items-center justify-center">
+        <!-- Ring 1 (Horizontal Inclination) -->
+        <div class="absolute inset-0 rounded-full border border-cyan-400/50 ring-spin-fast [transform:rotateX(72deg)] shadow-[0_0_15px_rgba(0,243,255,0.4)]"></div>
+        <!-- Ring 2 (Vertical Inclination) -->
+        <div class="absolute w-[400px] h-[400px] rounded-full border border-dashed border-cyan-300/40 ring-spin-slow [transform:rotateY(68deg)]"></div>
+        <!-- Ring 3 (Equatorial Ring with Degree Ticks) -->
+        <div class="absolute w-[460px] h-[460px] rounded-full border-2 border-cyan-500/30 [transform:rotateX(82deg)_rotateZ(25deg)] shadow-[0_0_25px_rgba(0,243,255,0.25)] flex items-center justify-center">
+          <div class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_#ffb700] absolute -top-1"></div>
+          <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f3ff] absolute -bottom-1"></div>
+        </div>
+      </div>
+
+      <!-- 3D Interactive Canvas: Holographic Particle Brain & Neural Mesh -->
+      <canvas id="brainCanvas" class="w-[460px] h-[440px] cursor-grab active:cursor-grabbing z-20"></canvas>
+
+      <!-- Bottom Pod Base / Magnetic Containment Floor -->
+      <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-80 h-10 border-b-2 border-t border-cyan-400/80 bg-gradient-to-t from-[#0e274a] to-transparent rounded-b-full shadow-[0_0_30px_rgba(0,243,255,0.5)] flex flex-col items-center justify-center pointer-events-none">
+        <div class="w-52 h-0.5 bg-amber-400/80 blur-xs rounded-full"></div>
+        <span class="text-[8px] font-mono-hud text-cyan-400 tracking-widest mt-0.5">MAGNETIC_CONTAINMENT_POD // REVIA_CORE</span>
+      </div>
+
+      <!-- Center Floating Label: ENERGY OUTPUT -->
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 px-3.5 py-1 glass-hud rounded-full flex items-center gap-2.5 border border-amber-400/50 shadow-[0_0_15px_rgba(255,183,0,0.3)] energy-pulse z-30">
+        <div class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#ffb700] animate-ping"></div>
+        <span class="font-hud text-[11px] text-amber-300 font-bold tracking-widest glow-gold">ENERGY OUTPUT: 98%</span>
+        <span class="text-[8px] font-mono-hud text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-500/40">ONLINE</span>
+      </div>
+    </div>
+
+    <!-- RIGHT HUD COLUMN (FLOATING 3D GLASS WIDGETS) -->
+    <div class="w-72 flex flex-col gap-3.5 z-30">
+      
+      <!-- WIDGET 3: PROJECT ALPHA & LIVE DYNAMIC SOUNDWAVE -->
+      <div class="glass-hud panel-right-top p-3.5 rounded-lg">
+        <div class="flex items-center justify-between border-b border-cyan-500/30 pb-1.5 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <h3 class="font-hud text-[11px] tracking-wider text-cyan-300 font-bold">PROJECT ALPHA</h3>
+          </div>
+          <span class="text-[9px] font-mono-hud text-cyan-500">VOICE_BUS</span>
+        </div>
+        <p class="text-[10px] font-mono-hud text-cyan-400/80 mb-1.5">AUDIO SPECTRUM // DYNAMIC HARMONICS</p>
+
+        <!-- Dynamic Live Audio Soundwave Spike Canvas -->
+        <div class="h-20 w-full bg-cyan-950/40 border border-cyan-500/30 rounded overflow-hidden relative flex items-center justify-center p-1">
+          <canvas id="soundwaveCanvas" class="w-full h-full"></canvas>
+          <div id="ampLabel" class="absolute top-1 right-2 text-[8px] font-mono-hud text-cyan-400">AMPLITUDE: 94 dB</div>
+          <div class="absolute bottom-1 left-2 text-[8px] font-mono-hud text-amber-400">FREQ: 14.2 kHz</div>
+        </div>
+      </div>
+
+      <!-- WIDGET 4: NEURAL TELEMETRY & QUANTUM EXECUTION -->
+      <div class="glass-hud panel-right-bottom p-3.5 rounded-lg">
+        <div class="flex items-center justify-between border-b border-cyan-500/30 pb-1.5 mb-2.5">
+          <h3 class="font-hud text-[11px] tracking-wider text-cyan-300 font-bold">COGNITIVE STATUS</h3>
+          <span class="text-[9px] font-mono-hud text-cyan-400">ACTIVE</span>
+        </div>
+
+        <div class="space-y-2 text-[10px] font-mono-hud">
+          <div class="flex justify-between items-center bg-cyan-950/40 p-1 rounded border border-cyan-500/20">
+            <span class="text-cyan-400">ACTIVE NEURAL NODES:</span>
+            <span class="text-cyan-200 font-bold">14,208 / 14,208</span>
+          </div>
+
+          <div class="flex justify-between items-center bg-cyan-950/40 p-1 rounded border border-cyan-500/20">
+            <span class="text-cyan-400">DEEP SEARCH THREADS:</span>
+            <span class="text-amber-400 font-bold glow-gold">MULTI-SOURCE [LIVE]</span>
+          </div>
+
+          <div class="flex justify-between items-center bg-cyan-950/40 p-1 rounded border border-cyan-500/20">
+            <span class="text-cyan-400">CLOUD REASONING ENGINE:</span>
+            <span class="text-cyan-200 font-bold">GROQ 120B LPU</span>
+          </div>
+
+          <div class="flex justify-between items-center bg-cyan-950/40 p-1 rounded border border-cyan-500/20">
+            <span class="text-cyan-400">VISION / MULTIMODAL:</span>
+            <span class="text-cyan-200 font-bold">GEMINI 3.8 FLASH</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- INTEGRATED CYBERNETIC CHAT & COMMAND CONSOLE (DOCKED / EXPANDABLE) -->
+  <section id="chatConsoleContainer" class="relative z-30 mx-8 mb-2 glass-hud rounded-lg border border-cyan-400/40 shadow-[0_0_25px_rgba(0,243,255,0.2)] transition-all duration-300">
+    
+    <!-- Console Header Bar with Action Controls -->
+    <div class="flex items-center justify-between px-4 py-2 border-b border-cyan-500/30 bg-[#051126]/80 rounded-t-lg">
+      <div class="flex items-center gap-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f3ff] animate-pulse"></span>
+        <span class="font-hud text-xs font-bold text-cyan-300 tracking-wider">COMMAND CONSOLE // SYNAPSE CHAT</span>
+        <span id="chatStatusPill" class="text-[9px] font-mono-hud text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-500/40">READY</span>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button id="toggleChatSizeBtn" title="Expand or collapse chat history" class="px-2.5 py-1 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono-hud rounded transition">
+          <span id="toggleChatIcon">▲ EXPAND</span>
+        </button>
+        <button id="diagnoseScreenBtn" title="Analyze active desktop screen with Gemini Vision" class="px-2.5 py-1 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono-hud rounded transition flex items-center gap-1">
+          <span>📸</span> DIAGNOSE SCREEN
+        </button>
+        <button id="stopVoiceBtn" title="Stop ongoing voice audio immediately" class="px-2.5 py-1 bg-red-950/60 hover:bg-red-900 border border-red-500/40 text-red-300 text-[10px] font-mono-hud rounded transition flex items-center gap-1">
+          <span>🛑</span> STOP
+        </button>
+        <button id="clearChatBtn" title="Clear conversation memory" class="px-2.5 py-1 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono-hud rounded transition">
+          <span>🗑️</span> CLEAR
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable Message Stream -->
+    <div id="chatStream" class="h-44 overflow-y-auto px-4 py-3 space-y-2.5 hud-scrollbar bg-[#020817]/90 text-xs font-mono-hud transition-all duration-300">
+      <!-- Initial Greeting Injected Dynamically -->
+    </div>
+
+    <!-- Active Input Bar & Transmit Controls -->
+    <div class="flex items-center gap-2.5 p-2.5 bg-[#030d22]/95 border-t border-cyan-500/30 rounded-b-lg">
+      <!-- Voice Mic Trigger -->
+      <button id="voiceMicBtn" class="px-3.5 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black font-hud text-xs font-bold rounded shadow-[0_0_12px_rgba(255,183,0,0.5)] transition-all flex items-center gap-1.5 active:scale-95 shrink-0">
+        <span id="micIcon">🎙️</span> <span id="micText">MIC</span>
+      </button>
+
+      <!-- Text Input Field -->
+      <div class="relative flex-1">
+        <input 
+          id="cmdInput" 
+          type="text" 
+          placeholder="Ask REVIA anything (e.g. 'Deep search latest quantum chips', 'Check jobs', 'Diagnose screen')..." 
+          class="w-full bg-[#061430] border border-cyan-500/40 rounded px-3.5 py-2 text-cyan-100 placeholder-cyan-600/70 font-mono-hud text-xs focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_12px_rgba(0,243,255,0.4)]"
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Transmit / Send Button -->
+      <button id="transmitBtn" class="px-5 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-hud text-xs font-bold rounded shadow-[0_0_15px_rgba(0,243,255,0.5)] transition-all flex items-center gap-2 active:scale-95 shrink-0">
+        <span>⚡</span> TRANSMIT
+      </button>
+    </div>
+  </section>
+
+  <!-- BOTTOM SCI-FI TACTILE CONTROL DECK CONSOLE -->
+  <footer class="relative z-30 w-full bg-[#050b1a] border-t-2 border-cyan-500/40 px-8 py-2.5 flex flex-wrap items-center justify-between shadow-[0_-10px_30px_rgba(0,243,255,0.15)]">
+    <!-- Left Interactive Trigger Buttons -->
+    <div class="flex items-center gap-2.5">
+      <button id="pulseSynapseBtn" class="px-3.5 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-hud text-[11px] font-bold rounded shadow-[0_0_12px_rgba(0,243,255,0.4)] transition-all transform active:scale-95 flex items-center gap-1.5">
+        <span>⚡</span> PULSE SYNAPSE
+      </button>
+
+      <button id="voiceSimBtn" class="px-3.5 py-1.5 bg-[#091e3e] hover:bg-[#0c2a57] border border-cyan-400/50 text-cyan-300 font-hud text-[11px] font-bold rounded shadow-[0_0_10px_rgba(0,243,255,0.2)] transition-all transform active:scale-95 flex items-center gap-1.5">
+        <span>🔊</span> AUDIO PULSE
+      </button>
+
+      <button id="toggleOrbitBtn" class="px-3.5 py-1.5 bg-[#091e3e] hover:bg-[#0c2a57] border border-amber-400/50 text-amber-300 font-hud text-[11px] font-bold rounded shadow-[0_0_10px_rgba(255,183,0,0.2)] transition-all transform active:scale-95 flex items-center gap-1.5">
+        <span>🔄</span> AUTO-ORBIT: ON
+      </button>
+    </div>
+
+    <!-- Center Control Slider Telemetry -->
+    <div class="hidden lg:flex items-center gap-4 text-[11px] font-mono-hud text-cyan-400">
+      <div>
+        <span>SYNAPTIC SPEED:</span>
+        <input id="speedSlider" type="range" min="1" max="5" value="2" class="ml-2 accent-cyan-400 cursor-pointer">
+      </div>
+      <div>
+        <span>PARTICLE DENSITY:</span>
+        <input id="particleSlider" type="range" min="200" max="1200" value="700" class="ml-2 accent-amber-400 cursor-pointer">
+      </div>
+    </div>
+
+    <!-- Right System Serial Readout -->
+    <div class="flex items-center gap-3 text-right">
+      <span class="text-[9px] font-mono-hud text-cyan-500">SERIAL NO: REVIA-AI-7749-X<br>NATIVE DESKTOP HUD ACTIVE</span>
+      <div class="w-2.5 h-2.5 rounded-full bg-green-400 shadow-[0_0_10px_#00ff66]"></div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT: 3D HOLOGRAPHIC BRAIN & INTERACTIVE HUD ENGINE -->
+  <script>
+    // ── 1. Live Clock ────────────────────────────────────────────────────────────
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0] + ' UTC';
+      const el = document.getElementById('liveClock');
+      if (el) el.innerText = timeStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ── 2. Procedural 3D Holographic Particle Brain ─────────────────────────────
+    const brainCanvas = document.getElementById('brainCanvas');
+    const ctx = brainCanvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = brainCanvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      brainCanvas.width = rect.width * dpr;
+      brainCanvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function generateBrainPoints(count = 700) {
+      const points = [];
+      for (let i = 0; i < count; i++) {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        const r = Math.cbrt(Math.random());
+
+        let x = r * Math.sin(phi) * Math.cos(theta);
+        let y = r * Math.sin(phi) * Math.sin(theta);
+        let z = r * Math.cos(phi);
+
+        // Deform sphere into twin hemisphere cortex structure
+        x *= (x > 0) ? 1.15 : 1.15;
+        x += (x > 0 ? 0.12 : -0.12);
+        y *= 1.35;
+        z *= 0.85;
+
+        // Frontal & occipital poles
+        if (y > 0.3) { x *= 0.9; z *= 0.9; }
+        if (y < -0.3) { z *= 0.8; }
+
+        const isGold = Math.random() < 0.15;
+        points.push({
+          x: x * 105,
+          y: y * 105,
+          z: z * 105,
+          color: isGold ? '#ffb700' : '#00f3ff',
+          glow: isGold ? 'rgba(255, 183, 0, 0.8)' : 'rgba(0, 243, 255, 0.7)',
+          size: isGold ? (Math.random() * 2.2 + 1.2) : (Math.random() * 1.6 + 0.8),
+          pulseOffset: Math.random() * Math.PI * 2
+        });
+      }
+      return points;
+    }
+
+    let particleCount = 700;
+    let particles = generateBrainPoints(particleCount);
+    let angleX = 0.2;
+    let angleY = 0;
+    let rotationSpeed = 0.008;
+    let autoOrbit = true;
+    let isPulsing = false;
+    let pulseWave = 0;
+
+    // Mouse Drag Rotation
+    let isDragging = false;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+
+    brainCanvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevMouseX;
+      const dy = e.clientY - prevMouseY;
+      angleY += dx * 0.008;
+      angleX += dy * 0.008;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    });
+
+    // ── 3. Render 3D Brain Loop ──────────────────────────────────────────────────
+    function renderBrain() {
+      const w = brainCanvas.clientWidth;
+      const h = brainCanvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      if (autoOrbit && !isDragging) {
+        angleY += rotationSpeed;
+      }
+
+      if (isPulsing) {
+        pulseWave += 0.05;
+        if (pulseWave > 2.0) isPulsing = false;
+      }
+
+      const cosY = Math.cos(angleY);
+      const sinY = Math.sin(angleY);
+      const cosX = Math.cos(angleX);
+      const sinX = Math.sin(angleX);
+
+      const fov = 340;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      const projected = [];
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+
+        let x1 = p.x * cosY - p.z * sinY;
+        let z1 = p.z * cosY + p.x * sinY;
+
+        let y2 = p.y * cosX - z1 * sinX;
+        let z2 = z1 * cosX + p.y * sinX;
+
+        const distance = z2 + 280;
+        if (distance <= 0) continue;
+
+        const scale = fov / distance;
+        let screenX = cx + x1 * scale;
+        let screenY = cy + y2 * scale;
+
+        let particleSize = p.size * scale * 0.9;
+        if (isPulsing) {
+          const waveDist = Math.abs((p.y / 105) - (pulseWave - 1.0));
+          if (waveDist < 0.25) {
+            particleSize *= 2.2;
+          }
+        }
+
+        projected.push({
+          x: screenX,
+          y: screenY,
+          size: particleSize,
+          color: p.color,
+          glow: p.glow,
+          z: z2
+        });
+      }
+
+      projected.sort((a, b) => b.z - a.z);
+
+      // Draw Synaptic Connections
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < projected.length; i += 6) {
+        for (let j = i + 1; j < Math.min(i + 4, projected.length); j++) {
+          const dx = projected[i].x - projected[j].x;
+          const dy = projected[i].y - projected[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 32) {
+            ctx.strokeStyle = `rgba(0, 243, 255, ${0.35 * (1 - dist / 32)})`;
+            ctx.beginPath();
+            ctx.moveTo(projected[i].x, projected[i].y);
+            ctx.lineTo(projected[j].x, projected[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw Particles
+      for (let i = 0; i < projected.length; i++) {
+        const p = projected[i];
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.glow;
+        ctx.shadowBlur = p.size > 2.0 ? 10 : 4;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(0.6, p.size), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.shadowBlur = 0;
+      requestAnimationFrame(renderBrain);
+    }
+    renderBrain();
+
+    // ── 4. Live Soundwave Canvas Visualizer ──────────────────────────────────────
+    const soundCanvas = document.getElementById('soundwaveCanvas');
+    const sCtx = soundCanvas.getContext('2d');
+    let soundwavePhase = 0;
+    let audioEnergy = 1.0;
+
+    function renderSoundwave() {
+      const w = soundCanvas.width = soundCanvas.clientWidth;
+      const h = soundCanvas.height = soundCanvas.clientHeight;
+      sCtx.clearRect(0, 0, w, h);
+
+      soundwavePhase += 0.08 * audioEnergy;
+      const centerY = h / 2;
+      const barCount = 38;
+      const barWidth = w / barCount;
+
+      for (let i = 0; i < barCount; i++) {
+        const norm = i / barCount;
+        const wave1 = Math.sin(norm * 14 + soundwavePhase) * 0.5 + 0.5;
+        const wave2 = Math.cos(norm * 8 - soundwavePhase * 1.2) * 0.5 + 0.5;
+        const bellCurve = Math.sin(norm * Math.PI);
+
+        let height = (wave1 * 0.6 + wave2 * 0.4) * bellCurve * (h * 0.75) * audioEnergy;
+        height = Math.max(3, Math.min(h - 4, height));
+
+        const isSpike = (i === 14 || i === 22 || i === 29) && (audioEnergy > 1.4);
+        sCtx.fillStyle = isSpike ? '#ffb700' : 'rgba(0, 243, 255, 0.85)';
+        sCtx.shadowColor = isSpike ? '#ffb700' : '#00f3ff';
+        sCtx.shadowBlur = 6;
+
+        sCtx.fillRect(i * barWidth + 1, centerY - height / 2, barWidth - 2, height);
+      }
+      sCtx.shadowBlur = 0;
+
+      if (audioEnergy > 1.0) {
+        audioEnergy -= 0.018;
+      }
+
+      requestAnimationFrame(renderSoundwave);
+    }
+    renderSoundwave();
+
+    // ── 5. Wireframe 3D Box Canvas ───────────────────────────────────────────────
+    const wireCanvas = document.getElementById('wireframeBoxCanvas');
+    const wCtx = wireCanvas.getContext('2d');
+    let boxAngle = 0;
+
+    function renderWireframe() {
+      const w = wireCanvas.width = wireCanvas.clientWidth;
+      const h = wireCanvas.height = wireCanvas.clientHeight;
+      wCtx.clearRect(0, 0, w, h);
+
+      boxAngle += 0.015;
+      const size = 26;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      const nodes = [
+        [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+        [-1, -1,  1], [1, -1,  1], [1, 1,  1], [-1, 1,  1]
+      ];
+
+      const cos = Math.cos(boxAngle);
+      const sin = Math.sin(boxAngle);
+
+      const projectedNodes = nodes.map(([x, y, z]) => {
+        let rx = x * cos - z * sin;
+        let rz = z * cos + x * sin;
+        let ry = y * 0.9 - rz * 0.4;
+        return [cx + rx * size, cy + ry * size];
+      });
+
+      const edges = [
+        [0, 1], [1, 2], [2, 3], [3, 0],
+        [4, 5], [5, 6], [6, 7], [7, 4],
+        [0, 4], [1, 5], [2, 6], [3, 7]
+      ];
+
+      wCtx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
+      wCtx.lineWidth = 1.2;
+      wCtx.shadowColor = '#00f3ff';
+      wCtx.shadowBlur = 8;
+
+      edges.forEach(([i, j]) => {
+        wCtx.beginPath();
+        wCtx.moveTo(projectedNodes[i][0], projectedNodes[i][1]);
+        wCtx.lineTo(projectedNodes[j][0], projectedNodes[j][1]);
+        wCtx.stroke();
+      });
+      wCtx.shadowBlur = 0;
+
+      requestAnimationFrame(renderWireframe);
+    }
+    renderWireframe();
+
+    // ── 6. Mini Telemetry Histogram Canvas ──────────────────────────────────────
+    const miniCanvas = document.getElementById('miniTelemetryCanvas');
+    const mCtx = miniCanvas.getContext('2d');
+    const bars = Array.from({ length: 24 }, () => Math.random() * 0.7 + 0.3);
+
+    function renderMiniPlot() {
+      const w = miniCanvas.width = miniCanvas.clientWidth;
+      const h = miniCanvas.height = miniCanvas.clientHeight;
+      mCtx.clearRect(0, 0, w, h);
+
+      const barWidth = w / bars.length;
+      if (Math.random() < 0.25) {
+        const idx = Math.floor(Math.random() * bars.length);
+        bars[idx] = Math.random() * 0.85 + 0.15;
+      }
+
+      for (let i = 0; i < bars.length; i++) {
+        const barH = bars[i] * (h - 6);
+        mCtx.fillStyle = (i % 6 === 0) ? '#ffb700' : 'rgba(0, 243, 255, 0.65)';
+        mCtx.fillRect(i * barWidth, h - barH, barWidth - 1.5, barH);
+      }
+
+      requestAnimationFrame(renderMiniPlot);
+    }
+    renderMiniPlot();
+
+    // ── 7. PyWebView Integration & Bidirectional Bridge ─────────────────────────
+
+    const chatStream = document.getElementById('chatStream');
+    const cmdInput = document.getElementById('cmdInput');
+    const transmitBtn = document.getElementById('transmitBtn');
+    const voiceMicBtn = document.getElementById('voiceMicBtn');
+    const stopVoiceBtn = document.getElementById('stopVoiceBtn');
+    const clearChatBtn = document.getElementById('clearChatBtn');
+    const diagnoseScreenBtn = document.getElementById('diagnoseScreenBtn');
+    const chatStatusPill = document.getElementById('chatStatusPill');
+    const systemStateBadge = document.getElementById('systemStateBadge');
+    const toggleChatSizeBtn = document.getElementById('toggleChatSizeBtn');
+    const toggleChatIcon = document.getElementById('toggleChatIcon');
+
+    let isExpanded = false;
+
+    // Toggle Chat Size between compact & expanded
+    toggleChatSizeBtn.addEventListener('click', () => {
+      isExpanded = !isExpanded;
+      if (isExpanded) {
+        chatStream.style.height = '280px';
+        toggleChatIcon.innerText = '▼ MINIMIZE';
+      } else {
+        chatStream.style.height = '176px';
+        toggleChatIcon.innerText = '▲ EXPAND';
+      }
+    });
+
+    // Helper: Escape HTML & format lightweight markdown
+    function formatMessageText(text) {
+      if (!text) return '';
+      let escaped = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // Code blocks ```code```
+      escaped = escaped.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+      // Inline `code`
+      escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // Bold **text**
+      escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-cyan-300 font-bold">$1</strong>');
+      // Bullet lists
+      escaped = escaped.replace(/^\s*[\-\*]\s+(.*)$/gm, '<li class="ml-4 list-disc text-cyan-200/90">$1</li>');
+      // Line breaks
+      escaped = escaped.replace(/\n/g, '<br/>');
+
+      return escaped;
+    }
+
+    // Window functions exposed to Python
+    window.reviaAddMessage = function(data) {
+      const sender = data.sender || 'revia';
+      const text = data.text || '';
+      const badge = data.badge || '';
+
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `flex flex-col ${sender === 'user' ? 'items-end' : 'items-start'} mb-2.5`;
+
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble max-w-[85%] px-3.5 py-2.5 rounded-lg border leading-relaxed ${
+        sender === 'user' 
+          ? 'bg-cyan-950/80 border-cyan-400/60 text-cyan-100 shadow-[0_0_12px_rgba(0,243,255,0.2)]'
+          : 'bg-[#081836]/90 border-blue-500/40 text-slate-100 shadow-[0_0_15px_rgba(0,102,255,0.2)]'
+      }`;
+
+      // Header tag
+      const tag = document.createElement('div');
+      tag.className = 'text-[9px] font-mono-hud mb-1 flex items-center gap-1.5';
+      if (sender === 'user') {
+        tag.innerHTML = '<span class="text-cyan-400 font-bold">👤 OPERATOR</span>';
+      } else {
+        tag.innerHTML = '<span class="text-amber-400 font-bold glow-gold">⚡ REVIA</span> <span class="text-cyan-500">• 120B SYNAPSE</span>';
+      }
+
+      if (badge) {
+        tag.innerHTML += ` <span class="px-1.5 py-0.2 bg-cyan-900/60 border border-cyan-400/50 rounded text-cyan-300 text-[8px]">${badge}</span>`;
+      }
+
+      const body = document.createElement('div');
+      body.innerHTML = formatMessageText(text);
+
+      bubble.appendChild(tag);
+      bubble.appendChild(body);
+      msgDiv.appendChild(bubble);
+
+      chatStream.appendChild(msgDiv);
+      chatStream.scrollTop = chatStream.scrollHeight;
+    };
+
+    // ── Ultra-Fast Word-by-Word Streaming Handlers ──────────────────────────
+    window.reviaStreamMessage = function(data) {
+      const sender = (data && data.sender) || 'revia';
+      const badge = (data && data.badge) || '';
+      const text = (data && data.text) || '';
+
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'flex flex-col items-start mb-2.5';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble max-w-[85%] px-3.5 py-2.5 rounded-lg border leading-relaxed bg-[#081836]/90 border-blue-500/40 text-slate-100 shadow-[0_0_15px_rgba(0,102,255,0.2)]';
+
+      const tag = document.createElement('div');
+      tag.className = 'text-[9px] font-mono-hud mb-1 flex items-center gap-1.5';
+      tag.innerHTML = '<span class="text-amber-400 font-bold glow-gold">⚡ REVIA</span> <span class="text-cyan-500">• 120B SYNAPSE</span>';
+      if (badge) {
+        tag.innerHTML += ` <span class="px-1.5 py-0.2 bg-cyan-900/60 border border-cyan-400/50 rounded text-cyan-300 text-[8px]">${badge}</span>`;
+      }
+
+      const body = document.createElement('div');
+      body.innerHTML = '<span class="stream-text"></span><span class="inline-block w-1.5 h-3 bg-cyan-400 animate-pulse ml-0.5 align-middle"></span>';
+
+      bubble.appendChild(tag);
+      bubble.appendChild(body);
+      msgDiv.appendChild(bubble);
+
+      chatStream.appendChild(msgDiv);
+      chatStream.scrollTop = chatStream.scrollHeight;
+
+      const words = text.split(" ");
+      let wordIdx = 0;
+      const textSpan = body.querySelector('.stream-text');
+
+      const iv = setInterval(() => {
+        if (wordIdx >= words.length) {
+          clearInterval(iv);
+          body.innerHTML = formatMessageText(text);
+          chatStream.scrollTop = chatStream.scrollHeight;
+          return;
+        }
+        const step = words.length > 70 ? 2 : 1;
+        wordIdx = Math.min(words.length, wordIdx + step);
+        textSpan.innerText = words.slice(0, wordIdx).join(" ");
+        chatStream.scrollTop = chatStream.scrollHeight;
+      }, 14);
+    };
+
+    let currentStreamBody = null;
+    let currentRawStreamText = "";
+
+    window.reviaStreamStart = function(data) {
+      window.reviaStreamMessage(data);
+    };
+
+    window.reviaStreamChunk = function(chunk) {};
+    window.reviaStreamEnd = function(fullText) {};
+
+    window.reviaSetState = function(data) {
+      const state = (data.state || 'ONLINE').toUpperCase();
+      const text = data.text || '';
+
+      if (chatStatusPill) chatStatusPill.innerText = text ? `${state}: ${text}` : state;
+      if (systemStateBadge) {
+        systemStateBadge.innerText = state;
+        if (state === 'LISTENING') {
+          systemStateBadge.className = 'px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-400 font-bold animate-pulse';
+          voiceMicBtn.classList.add('mic-active');
+          document.getElementById('micText').innerText = 'LISTENING...';
+        } else if (state === 'THINKING') {
+          systemStateBadge.className = 'px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-400 font-bold animate-pulse';
+          voiceMicBtn.classList.remove('mic-active');
+          document.getElementById('micText').innerText = 'MIC';
+        } else if (state === 'SPEAKING') {
+          systemStateBadge.className = 'px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-400 font-bold';
+          voiceMicBtn.classList.remove('mic-active');
+          document.getElementById('micText').innerText = 'MIC';
+        } else {
+          systemStateBadge.className = 'px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-400/60 font-bold';
+          voiceMicBtn.classList.remove('mic-active');
+          document.getElementById('micText').innerText = 'MIC';
+        }
+      }
+    };
+
+    window.reviaAudioSpike = function(amplitude) {
+      audioEnergy = Math.max(audioEnergy, parseFloat(amplitude) || 2.0);
+      const ampLabel = document.getElementById('ampLabel');
+      if (ampLabel) {
+        ampLabel.innerText = `AMPLITUDE: ${Math.round(85 + audioEnergy * 6)} dB`;
+      }
+    };
+
+    window.reviaUpdateStats = function(stats) {
+      if (!stats) return;
+      if (stats.cpu_percent !== undefined) {
+        const cpu = document.getElementById('cpuVal');
+        const cpuBar = document.getElementById('cpuBar');
+        if (cpu) cpu.innerText = `${stats.cpu_percent} %`;
+        if (cpuBar) cpuBar.style.width = `${Math.min(100, stats.cpu_percent)}%`;
+      }
+      if (stats.ram_percent !== undefined) {
+        const ram = document.getElementById('ramVal');
+        const ramBar = document.getElementById('ramBar');
+        if (ram) ram.innerText = `${stats.ram_used_gb || 0} / ${stats.ram_total_gb || 0} GB`;
+        if (ramBar) ramBar.style.width = `${Math.min(100, stats.ram_percent)}%`;
+      }
+      if (stats.timestamp) {
+        const lat = document.getElementById('latencyLabel');
+        if (lat) lat.innerText = `SYNC: ${stats.timestamp}`;
+      }
+    };
+
+    // ── 8. User Interaction Triggers ──────────────────────────────────────────
+
+    function transmitMessage() {
+      const text = cmdInput.value.trim();
+      if (!text) return;
+      cmdInput.value = '';
+
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.send_message(text);
+      } else {
+        // Standalone browser fallback simulation
+        window.reviaAddMessage({ sender: 'user', text: text });
+        window.reviaSetState({ state: 'THINKING', text: 'Cloud reasoning...' });
+        setTimeout(() => {
+          window.reviaAddMessage({
+            sender: 'revia',
+            text: `[Simulation] Processed input: "${text}". Running in preview mode.`
+          });
+          window.reviaSetState({ state: 'ONLINE', text: 'Ready' });
+        }, 1200);
+      }
+    }
+
+    transmitBtn.addEventListener('click', transmitMessage);
+
+    cmdInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        transmitMessage();
+      } else if (e.key === 'Escape') {
+        if (window.pywebview && window.pywebview.api) {
+          window.pywebview.api.stop_speech();
+        }
+      }
+    });
+
+    voiceMicBtn.addEventListener('click', () => {
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.toggle_voice();
+      } else {
+        window.reviaSetState({ state: 'LISTENING', text: 'Voice simulated...' });
+        setTimeout(() => {
+          window.reviaSetState({ state: 'ONLINE', text: 'Ready' });
+        }, 3000);
+      }
+    });
+
+    diagnoseScreenBtn.addEventListener('click', () => {
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.diagnose_screen();
+      }
+    });
+
+    stopVoiceBtn.addEventListener('click', () => {
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.stop_speech();
+      }
+    });
+
+    clearChatBtn.addEventListener('click', () => {
+      chatStream.innerHTML = '';
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.clear_chat();
+      }
+    });
+
+    // Pulse Synapse Button
+    document.getElementById('pulseSynapseBtn').addEventListener('click', () => {
+      isPulsing = true;
+      pulseWave = 0;
+      audioEnergy = 2.4;
+    });
+
+    // Voice Wave Harmonics Button
+    document.getElementById('voiceSimBtn').addEventListener('click', () => {
+      audioEnergy = 2.8;
+      rotationSpeed = 0.035;
+      setTimeout(() => { rotationSpeed = 0.008; }, 2500);
+    });
+
+    // Auto-Orbit Toggle
+    document.getElementById('toggleOrbitBtn').addEventListener('click', (e) => {
+      autoOrbit = !autoOrbit;
+      e.currentTarget.innerHTML = autoOrbit 
+        ? '<span>🔄</span> AUTO-ORBIT: ON' 
+        : '<span>🔄</span> AUTO-ORBIT: OFF';
+    });
+
+    // Speed Slider
+    document.getElementById('speedSlider').addEventListener('input', (e) => {
+      rotationSpeed = 0.004 * parseFloat(e.target.value);
+    });
+
+    // Particle Density Slider
+    document.getElementById('particleSlider').addEventListener('input', (e) => {
+      particleCount = parseInt(e.target.value);
+      particles = generateBrainPoints(particleCount);
+    });
+
+    // PyWebView Ready — NOTE: on_ui_ready is now called by the boot sequence button, not here.
+    window.addEventListener('pywebviewready', () => {
+      console.log("[REVIA] PyWebView Bridge Ready — waiting for boot sequence to complete.");
+    });
+
+    // Standalone fallback: If not in pywebview within 1 sec, initialize greeting
+    // (only if boot screen was already dismissed)
+    window.reviaBootComplete = function() {
+      setTimeout(() => {
+        if (!window.pywebview || !window.pywebview.api) {
+          window.reviaAddMessage({
+            sender: 'revia',
+            text: 'Hi, I am REVIA. How can I help you?'
+          });
+        }
+      }, 400);
+    };
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       BOOT SEQUENCE JAVASCRIPT ENGINE
+  ════════════════════════════════════════════════════════════════════════ -->
+  <script>
+  (function() {
+    // ── Orbit particle canvas ──────────────────────────────────────────────
+    const bhc = document.getElementById('bootHexCanvas');
+    const bhCtx = bhc.getContext('2d');
+    function resizeBhc() { bhc.width = bhc.offsetWidth || 300; bhc.height = bhc.offsetHeight || 300; }
+    window.addEventListener('resize', resizeBhc);
+    resizeBhc();
+
+    const bootParts = [];
+    for (let i = 0; i < 55; i++) {
+      bootParts.push({
+        angle: Math.random() * Math.PI * 2,
+        radius: 120 + Math.random() * 26,
+        speed: (Math.random() < 0.5 ? 1 : -1) * (0.003 + Math.random() * 0.006),
+        size: Math.random() * 2.4 + 0.8,
+        gold: Math.random() < 0.2,
+        alpha: 0.3 + Math.random() * 0.7,
+        pulse: Math.random() * Math.PI * 2,
+      });
+    }
+
+    function drawBootParts() {
+      const W = bhc.width, H = bhc.height;
+      bhCtx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      bootParts.forEach(p => {
+        p.angle += p.speed; p.pulse += 0.04;
+        const x = cx + Math.cos(p.angle) * p.radius;
+        const y = cy + Math.sin(p.angle) * p.radius;
+        const a = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+        const col = p.gold ? `rgba(255,183,0,${a})` : `rgba(0,243,255,${a})`;
+        bhCtx.beginPath(); bhCtx.arc(x, y, p.size, 0, Math.PI * 2);
+        bhCtx.fillStyle = col; bhCtx.shadowColor = col; bhCtx.shadowBlur = 8; bhCtx.fill();
+      });
+      bhCtx.shadowBlur = 0;
+      requestAnimationFrame(drawBootParts);
+    }
+    drawBootParts();
+
+    // ── Floating hex numbers ───────────────────────────────────────────────
+    const bootOv = document.getElementById('bootOverlay');
+    const hexChars = '0123456789ABCDEF';
+    function rHex(n) { return Array.from({length:n},()=>hexChars[Math.floor(Math.random()*16)]).join(''); }
+    for (let i = 0; i < 26; i++) {
+      const el = document.createElement('div');
+      el.className = 'boot-hex';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.top  = Math.random() * 100 + 'vh';
+      el.style.animationDelay = (Math.random() * 4) + 's';
+      el.style.animationDuration = (2 + Math.random() * 4) + 's';
+      el.textContent = rHex(8);
+      setInterval(() => { el.textContent = rHex(8); }, 400 + Math.random() * 600);
+      bootOv.appendChild(el);
+    }
+
+    // ── Boot log tick ──────────────────────────────────────────────────────
+    const bootLines  = document.querySelectorAll('.bll');
+    const bootBar    = document.getElementById('bootProgBar');
+    const bootPct    = document.getElementById('bootProgPct');
+    const bootPhase  = document.getElementById('bootProgPhase');
+    const bootBtn    = document.getElementById('bootEnterBtn');
+
+    const bootPhases = [
+      'INITIALIZING BIOS CHAIN','LOADING SYNAPTIC CORE','MOUNTING VISION MODULE',
+      'BUILDING NEURAL MESH','OPENING QUANTUM BUS','ALLOCATING MEMORY',
+      'LOADING TTS ENGINE','CALIBRATING STT MODULE','SANDBOXING PC AGENT',
+      'SPAWNING SEARCH THREADS','MOUNTING HOLOGRAPHIC HUD','ALL SYSTEMS NOMINAL',
+    ];
+
+    let bLineIdx = 0, bProgress = 0;
+
+    function animBootBar(from, to) {
+      const steps = 12; let s = 0;
+      const iv = setInterval(() => {
+        s++; const v = from + (to - from) * s / steps;
+        bootBar.style.width = v + '%'; bootPct.textContent = Math.round(v) + '%';
+        if (s >= steps) clearInterval(iv);
+      }, 12);
+    }
+
+    function bootTick() {
+      if (bLineIdx >= bootLines.length) {
+        animBootBar(bProgress, 100);
+        bootPct.textContent = '100%';
+        bootPhase.textContent = '⚡ REVIA ONLINE — ALL SYSTEMS NOMINAL';
+        bootPhase.style.color = '#00ff88';
+        setTimeout(() => bootBtn.classList.add('boot-ready'), 200);
+        return;
+      }
+      bootLines[bLineIdx].classList.add('vis');
+      if (bootPhases[bLineIdx]) bootPhase.textContent = bootPhases[bLineIdx];
+      const target = Math.round((bLineIdx + 1) / bootLines.length * 100);
+      animBootBar(bProgress, target); bProgress = target;
+      bLineIdx++;
+      const delay = bLineIdx < 3 ? 200 : bLineIdx < 8 ? 280 : 220;
+      setTimeout(bootTick, delay);
+    }
+
+    setTimeout(bootTick, 2700);
+
+    // ── Core glitch ────────────────────────────────────────────────────────
+    function glitchCore() {
+      const el = document.getElementById('bootCoreIcon');
+      const g = ['⚡','R','E','V','I','A','◈','▣','⬡','◉']; let c = 0;
+      const iv = setInterval(() => {
+        el.textContent = g[Math.floor(Math.random() * g.length)]; c++;
+        if (c > 5) { el.textContent = '⚡'; clearInterval(iv); }
+      }, 60);
+      setTimeout(glitchCore, 3000 + Math.random() * 4000);
+    }
+    setTimeout(glitchCore, 3500);
+  })();
+
+  // ── Launch handler ─────────────────────────────────────────────────────
+  function reviaBootLaunch() {
+    const flash = document.getElementById('bootFlash');
+    flash.style.opacity = '1';
+    setTimeout(() => {
+      flash.style.transition = 'opacity 0.7s ease';
+      flash.style.opacity = '0';
+      const boot = document.getElementById('bootOverlay');
+      boot.style.opacity = '0';
+      setTimeout(() => {
+        boot.style.display = 'none';
+        // Call Python bridge if available
+        if (window.pywebview && window.pywebview.api) {
+          window.pywebview.api.on_ui_ready();
+        }
+        // Call HUD standalone fallback
+        if (window.reviaBootComplete) window.reviaBootComplete();
+      }, 900);
+    }, 120);
+  }
+  </script>
+  <!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+</body>
+</html>
